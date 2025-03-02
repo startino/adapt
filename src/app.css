@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @ apply no longer exists */
+
 @layer base {
 	:root {
 		--background: 0 0% 100%;
@@ -63,8 +65,4 @@
 		--sidebar-border: 240 3.7% 15.9%;
 		--sidebar-ring: 217.2 91.2% 59.8%;
 	}
-}
-
-@layer base {
-	/* @ apply no longer exists */
 }
