@@ -1,25 +1,29 @@
-// import type { Handle } from '@sveltejs/kit';
-// import * as auth from '$lib/server/auth.js';
+import { createServerClient } from '@supabase/ssr';
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import type { Handle } from '@sveltejs/kit';
 
-// const handleAuth: Handle = async ({ event, resolve }) => {
-// 	const sessionToken = event.cookies.get(auth.sessionCookieName);
-// 	if (!sessionToken) {
-// 		event.locals.user = null;
-// 		event.locals.session = null;
-// 		return resolve(event);
-// 	}
+export const handle: Handle = async ({ event, resolve }) => {
+	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+		cookies: {
+			getAll: () => event.cookies.getAll(),
+			setAll: (cookies) => {
+				cookies.forEach(({ name, value, ...options }) => {
+					event.cookies.set(name, value, { ...options, path: '/' });
+				});
+			}
+		}
+	});
 
-// 	const { session, user } = await auth.validateSessionToken(sessionToken);
-// 	if (session) {
-// 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-// 	} else {
-// 		auth.deleteSessionTokenCookie(event);
-// 	}
+	event.locals.getSession = async () => {
+		const {
+			data: { session }
+		} = await event.locals.supabase.auth.getSession();
+		return session;
+	};
 
-// 	event.locals.user = user;
-// 	event.locals.session = session;
-
-// 	return resolve(event);
-// };
-
-// export const handle: Handle = handleAuth;
+	return resolve(event, {
+		filterSerializedResponseHeaders(name) {
+			return name === 'content-range';
+		}
+	});
+};

@@ -1,11 +1,14 @@
-import { db } from '$lib/server/db';
-import { profiles } from '$lib/server/db/schema';
-import { desc } from 'drizzle-orm';
+import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
-export const load = async () => {
-	const profilesList = await db.select().from(profiles).orderBy(desc(profiles.created_at));
+export const load: PageServerLoad = async ({ locals }) => {
+	const session = await locals.getSession();
+
+	if (!session) {
+		throw redirect(303, '/auth/login');
+	}
 
 	return {
-		profiles: profilesList
+		user: session.user
 	};
 };

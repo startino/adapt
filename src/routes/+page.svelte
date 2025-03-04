@@ -1,39 +1,61 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import {
+		Card,
+		CardContent,
+		CardDescription,
+		CardHeader,
+		CardTitle
+	} from '$lib/components/ui/card';
+	import { supabase } from '$lib/client/supabase';
+	import { goto } from '$app/navigation';
+
 	let { data } = $props();
+
+	async function handleLogout() {
+		await supabase.auth.signOut();
+		goto('/auth/login');
+	}
 </script>
 
 <div class="container mx-auto p-4">
-	<h1 class="mb-4 text-2xl font-bold">Profiles</h1>
+	<div class="mb-8 flex items-center justify-between">
+		<div>
+			<h1 class="text-3xl font-bold">Welcome, {data.user.email}</h1>
+			<p class="text-muted-foreground">Track your habits and build consistency</p>
+		</div>
+		<Button variant="outline" onclick={handleLogout}>Logout</Button>
+	</div>
 
-	<div class="overflow-x-auto">
-		<table class="min-w-full border border-gray-300 bg-white">
-			<thead>
-				<tr>
-					<th class="border-b px-4 py-2">Name</th>
-					<th class="border-b px-4 py-2">Email</th>
-					<th class="border-b px-4 py-2">Created At</th>
-					<th class="border-b px-4 py-2">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each data.profiles as profile}
-					<tr>
-						<td class="border-b px-4 py-2">
-							{profile.first_name}
-							{profile.last_name}
-						</td>
-						<td class="border-b px-4 py-2">{profile.email}</td>
-						<td class="border-b px-4 py-2">
-							{new Date(profile.created_at).toLocaleDateString()}
-						</td>
-						<td class="border-b px-4 py-2">
-							<a href="/app/profile/{profile.id}" class="text-blue-600 hover:text-blue-800">
-								View
-							</a>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		<Card>
+			<CardHeader>
+				<CardTitle>Daily Habits</CardTitle>
+				<CardDescription>Track your daily habits and build consistency</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<p>View and manage your daily habits</p>
+			</CardContent>
+		</Card>
+
+		<Card>
+			<CardHeader>
+				<CardTitle>Analytics</CardTitle>
+				<CardDescription>Monitor your progress and achievements</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<p>Check your habit completion rates and trends</p>
+			</CardContent>
+		</Card>
+
+		<Card>
+			<CardHeader>
+				<CardTitle>Settings</CardTitle>
+				<CardDescription>Customize your experience</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<p>Adjust your preferences and account settings</p>
+			</CardContent>
+		</Card>
 	</div>
 </div>
