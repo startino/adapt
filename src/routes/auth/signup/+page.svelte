@@ -18,10 +18,16 @@
 	let { data } = $props();
 	let isSubmitting = $state(false);
 
-	const schema = z.object({
-		email: z.string().email(),
-		password: z.string().min(6)
-	});
+	const schema = z
+		.object({
+			email: z.string().email(),
+			password: z.string().min(6),
+			confirmPassword: z.string().min(6)
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: "Passwords don't match",
+			path: ['confirmPassword']
+		});
 
 	const { form, errors, enhance } = superForm(data.form, {
 		validators: zod(schema),
@@ -47,8 +53,8 @@
 <div class="container flex h-screen w-screen flex-col items-center justify-center">
 	<Card class="w-[350px]">
 		<CardHeader>
-			<CardTitle>Login</CardTitle>
-			<CardDescription>Enter your email and password to login to your account.</CardDescription>
+			<CardTitle>Sign Up</CardTitle>
+			<CardDescription>Create a new account to get started.</CardDescription>
 		</CardHeader>
 		<form method="POST" use:enhance>
 			<CardContent class="grid gap-4">
@@ -73,11 +79,25 @@
 						type="password"
 						name="password"
 						bind:value={$form.password}
-						placeholder="Enter your password"
+						placeholder="Create a password"
 						disabled={isSubmitting}
 					/>
 					{#if $errors.password}
 						<p class="text-sm text-red-500">{$errors.password[0]}</p>
+					{/if}
+				</div>
+				<div class="grid gap-2">
+					<Label for="confirmPassword">Confirm Password</Label>
+					<Input
+						id="confirmPassword"
+						type="password"
+						name="confirmPassword"
+						bind:value={$form.confirmPassword}
+						placeholder="Confirm your password"
+						disabled={isSubmitting}
+					/>
+					{#if $errors.confirmPassword}
+						<p class="text-sm text-red-500">{$errors.confirmPassword[0]}</p>
 					{/if}
 				</div>
 			</CardContent>
@@ -86,11 +106,11 @@
 					{#if isSubmitting}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 					{/if}
-					Login
+					Sign Up
 				</Button>
 				<p class="text-muted-foreground text-center text-sm">
-					Don't have an account? <a href="/auth/signup" class="text-primary hover:underline"
-						>Sign up</a
+					Already have an account? <a href="/auth/login" class="text-primary hover:underline"
+						>Login</a
 					>
 				</p>
 			</CardFooter>
