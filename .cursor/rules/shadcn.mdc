@@ -1,0 +1,6 @@
+---
+description: Shadcn rules
+globs: 
+alwaysApply: false
+---
+- Use wildcards imports on components

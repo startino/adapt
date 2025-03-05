@@ -1,14 +1,27 @@
-import { redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { db } from '$lib/server/db';
+import { habits } from '$lib/server/db/schema';
+import { error } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export async function load({ locals }) {
 	const session = await locals.getSession();
-
 	if (!session) {
-		throw redirect(303, '/auth/login');
+		error(401, 'Unauthorized');
 	}
 
+	const allHabits = await db
+		.select({
+			id: habits.id,
+			name: habits.name,
+			description: habits.description,
+			category: habits.category,
+			icon: habits.icon,
+			owner_id: habits.owner_id
+		})
+		.from(habits)
+		.orderBy(habits.name);
+
 	return {
-		user: session.user
+		user: session.user,
+		habits: allHabits
 	};
-};
+}

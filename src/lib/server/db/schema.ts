@@ -60,7 +60,7 @@ export const chatMessages = pgTable('chat_messages', {
 		.default(sql`now()`)
 });
 
-export const habitCompTracks = pgTable('habit_comp_tracks', {
+export const habitCompTrack = pgTable('habit_comp_track', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	user_habit_id: uuid('user_habit_id').references(() => userHabits.id, { onDelete: 'cascade' }),
 	completed_at: timestamp('completed_at', { withTimezone: true, mode: 'date' })
@@ -76,8 +76,11 @@ export const habitCompTracks = pgTable('habit_comp_tracks', {
 
 export const habits = pgTable('habits', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	name: text('name').notNull(),
+	name: text('title').notNull(),
 	description: text('description'),
+	category: text('category').notNull().default('MOVE'),
+	icon: text('icon').notNull().default('🏃'),
+	owner_id: uuid('owner_id').references(() => profiles.id, { onDelete: 'cascade' }),
 	created_at: timestamp('created_at', { withTimezone: true, mode: 'date' })
 		.notNull()
 		.default(sql`now()`),
@@ -183,7 +186,7 @@ export const weightEntries = pgTable('weight_entries', {
 export type Profile = typeof profiles.$inferSelect;
 export type AnalyticsConfig = typeof analyticsConfigs.$inferSelect;
 export type ChatMessage = typeof chatMessages.$inferSelect;
-export type HabitCompTrack = typeof habitCompTracks.$inferSelect;
+export type HabitCompTrack = typeof habitCompTrack.$inferSelect;
 export type Habit = typeof habits.$inferSelect;
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 export type Reminder = typeof reminders.$inferSelect;
