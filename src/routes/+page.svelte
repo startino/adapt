@@ -2,17 +2,59 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import * as Card from '$lib/components/ui/card';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Badge } from '$lib/components/ui/badge';
+	import { Label } from '$lib/components/ui/label';
+	import { Input } from '$lib/components/ui/input';
+	import { Textarea } from '$lib/components/ui/textarea';
 	import { Plus, Settings, Check } from 'lucide-svelte';
 	import { supabase } from '$lib/client/supabase';
 	import { goto } from '$app/navigation';
 	import { invalidateAll } from '$app/navigation';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { zod } from 'sveltekit-superforms/adapters';
+	import { z } from 'zod';
+	import * as Select from '$lib/components/ui/select';
 
 	let { data } = $props();
 	let activeTab = $state('Habits');
 	let activeCategory = $state('move');
 	let isSubmitting = $state<string | null>(null);
+	let showNewHabitDialog = $state(false);
+
+	const habitSchema = z.object({
+		name: z.string().min(1, 'Name is required'),
+		description: z.string().optional(),
+		category: z.enum(['move', 'eat', 'sleep', 'mind']),
+		icon: z.string().min(1, 'Icon is required')
+	});
+
+	const { form, errors, enhance } = superForm(data.form, {
+		validators: zod(habitSchema),
+		onSubmit: () => {
+			isSubmitting = 'new';
+		},
+		onResult: ({ result }) => {
+			isSubmitting = null;
+			if (result.type === 'success') {
+				showNewHabitDialog = false;
+			}
+		}
+	});
+
+	let selectedCategory = $derived<{ value: 'move' | 'eat' | 'sleep' | 'mind'; label: string }>(
+		$form.category
+			? {
+					value: $form.category,
+					label: $form.category
+				}
+			: {
+					value: 'move',
+					label: 'move'
+				}
+	);
+
 	$inspect(data.habits.filter((h) => h.category === activeCategory));
 	async function handleLogout() {
 		await supabase.auth.signOut();
@@ -100,10 +142,98 @@
 						mind
 					</Button>
 				</div>
-				<Button size="icon" variant="default" class="rounded-full">
+				<Button
+					size="icon"
+					variant="default"
+					class="rounded-full"
+					onclick={() => (showNewHabitDialog = true)}
+				>
 					<Plus class="h-5 w-5" />
 				</Button>
 			</div>
+
+			<Dialog.Root bind:open={showNewHabitDialog}>
+				<Dialog.Content class="sm:max-w-[425px]">
+					<Dialog.Header>
+						<Dialog.Title>Create New Habit</Dialog.Title>
+						<Dialog.Description>
+							Add a new habit to track. Fill in the details below.
+						</Dialog.Description>
+					</Dialog.Header>
+					<form method="POST" action="?/createHabit" use:enhance>
+						<div class="grid gap-4 py-4">
+							<div class="grid gap-2">
+								<Label for="name">Name</Label>
+								<Input
+									id="name"
+									name="name"
+									bind:value={$form.name}
+									placeholder="Enter habit name"
+								/>
+								{#if $errors.name}
+									<p class="text-destructive text-sm">{$errors.name[0]}</p>
+								{/if}
+							</div>
+							<div class="grid gap-2">
+								<Label for="description">Description</Label>
+								<Textarea
+									id="description"
+									name="description"
+									bind:value={$form.description}
+									placeholder="Enter habit description"
+								/>
+								{#if $errors.description}
+									<p class="text-destructive text-sm">{$errors.description[0]}</p>
+								{/if}
+							</div>
+							<div class="grid gap-2">
+								<Label for="category">Category</Label>
+								<input type="hidden" name="category" bind:value={$form.category} />
+								<Select.Root
+									selected={selectedCategory}
+									onSelectedChange={(e) => ($form.category = e!.value)}
+								>
+									<Select.Trigger class="w-full">
+										<Select.Value placeholder="Select a category" />
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Item value="move">move</Select.Item>
+										<Select.Item value="eat">eat</Select.Item>
+										<Select.Item value="sleep">sleep</Select.Item>
+										<Select.Item value="mind">mind</Select.Item>
+									</Select.Content>
+								</Select.Root>
+								{#if $errors.category}
+									<p class="text-destructive text-sm">{$errors.category[0]}</p>
+								{/if}
+							</div>
+							<div class="grid gap-2">
+								<Label for="icon">Icon</Label>
+								<Input
+									id="icon"
+									name="icon"
+									bind:value={$form.icon}
+									placeholder="Enter emoji icon"
+								/>
+								{#if $errors.icon}
+									<p class="text-destructive text-sm">{$errors.icon[0]}</p>
+								{/if}
+							</div>
+						</div>
+						<Dialog.Footer>
+							<Button type="button" variant="outline" onclick={() => (showNewHabitDialog = false)}>
+								Cancel
+							</Button>
+							<Button type="submit" disabled={isSubmitting === 'new'}>
+								{#if isSubmitting === 'new'}
+									<span class="mr-2 animate-spin">◌</span>
+								{/if}
+								Create Habit
+							</Button>
+						</Dialog.Footer>
+					</form>
+				</Dialog.Content>
+			</Dialog.Root>
 
 			<div class="mt-6">
 				<p class="mb-4 text-lg">Select your habits below, or add your own with the plus</p>

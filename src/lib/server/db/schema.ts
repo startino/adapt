@@ -11,9 +11,12 @@ import {
 	time
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { authUsers } from 'drizzle-orm/supabase';
 
 export const profiles = pgTable('profiles', {
-	id: uuid('id').primaryKey(),
+	id: uuid('id')
+		.primaryKey()
+		.references(() => authUsers.id),
 	email: text('email').notNull().unique(),
 	is_admin: boolean('is_admin').notNull().default(false),
 	goal_what: text('goal_what'),

@@ -3,6 +3,11 @@ description: Tailwindcss 4 rules
 globs: 
 alwaysApply: false
 ---
+---
+description: Tailwindcss 4 rules
+globs: 
+alwaysApply: false
+---
 # Tailwind CSS 4 Rules
 
 ## Overview

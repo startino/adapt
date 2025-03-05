@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { userHabits, habitCompTracks } from '$lib/server/db/schema';
+import { userHabits, habitCompTrack } from '$lib/server/db/schema';
 import { error } from '@sveltejs/kit';
 import { eq, and, sql } from 'drizzle-orm';
 
@@ -31,7 +31,7 @@ export async function POST({ locals, params }) {
 	}
 
 	// Create a habit completion track
-	await db.insert(habitCompTracks).values({
+	await db.insert(habitCompTrack).values({
 		user_habit_id: userHabit.id,
 		date: sql`CURRENT_DATE`
 	});

@@ -11,3 +11,7 @@ Start all chat with 🚀
 - pnpm
 - Supabase
 - Lucide-svelte
+
+## Rules
+
+Keep the rules in .cursor/rules in sync with the rules here.
