@@ -175,7 +175,7 @@ This rules file should serve as a comprehensive guide to setting up and managing
 
 ## Components
 
-Below is a list of all the components in shadcn‑svelte next along with a brief description of their purpose. For more details and usage examples, you can refer to the [shadcn‑svelte documentation](https://www.shadcn-svelte.com/docs/components).
+Below is a list of all the components in shadcn‑svelte next along with a brief description of their purpose. For more details and usage examples, you can refer to the [shadcn‑svelte documentation](mdc:https:/www.shadcn-svelte.com/docs/components).
 
 - **Accordion**  
   A vertically stacked set of interactive headings that can expand or collapse to reveal associated content.

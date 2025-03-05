@@ -12,6 +12,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { authUsers } from 'drizzle-orm/supabase';
+import { categories } from '$lib/contants';
 
 export const profiles = pgTable('profiles', {
 	id: uuid('id')
@@ -81,7 +82,7 @@ export const habits = pgTable('habits', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('title').notNull(),
 	description: text('description'),
-	category: text('category').notNull().default('MOVE'),
+	category: text('category', { enum: categories }).notNull().default('MOVE'),
 	icon: text('icon').notNull().default('🏃'),
 	owner_id: uuid('owner_id').references(() => profiles.id, { onDelete: 'cascade' }),
 	created_at: timestamp('created_at', { withTimezone: true, mode: 'date' })

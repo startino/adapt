@@ -11,7 +11,12 @@ Start all chat with 🚀
 - pnpm
 - Supabase
 - Lucide-svelte
+- Superforms
 
 ## Rules
 
 Keep the rules in .cursor/rules in sync with the rules here.
+
+## File Structure For components
+
+Use index.ts files to export components like shadcn-svelte.
