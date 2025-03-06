@@ -109,15 +109,16 @@
 					</Select>
 				</div>
 			</div>
+
+			<div class="flex justify-end pt-4">
+				<Button type="submit" disabled={$submitting}>
+					{#if $submitting}
+						Saving...
+					{:else}
+						Save Changes
+					{/if}
+				</Button>
+			</div>
 		</form>
 	</Card.Content>
-	<Card.Footer class="flex justify-end">
-		<Button type="submit" disabled={$submitting}>
-			{#if $submitting}
-				Saving...
-			{:else}
-				Save Changes
-			{/if}
-		</Button>
-	</Card.Footer>
 </Card.Root>
