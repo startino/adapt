@@ -5,10 +5,11 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import { Settings } from 'lucide-svelte';
 	import type { Habit, UserHabit } from '$lib/server/db/schema';
-	import HabitEdit from './habit-edit.svelte';
+	import HabitSettings from './habit-settings.svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { z } from 'zod';
 	import { updateHabitSchema } from '$lib/schemas';
+	import { toggleHabitActive } from '$lib/utils';
 
 	type Props = {
 		habitsWithSettings: {
@@ -20,52 +21,50 @@
 	};
 
 	let { habitsWithSettings, activeCategory, form }: Props = $props();
-	let editingHabit = $state<Habit | null>(null);
+	let editingHabit = $state<{
+		habits: Habit;
+		user_habits: UserHabit;
+	} | null>(null);
 	let isSubmitting = $state<string | null>(null);
 
-	async function toggleHabitActive(id: string, isActive: boolean) {
+	async function handleToggleHabitActive(id: string, isActive: boolean) {
 		if (isSubmitting === id) return;
 		isSubmitting = id;
-		try {
-			const response = await fetch(`/api/habits/${id}/toggle`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ active: isActive })
-			});
 
-			const result = await response.json();
+		try {
+			const result = await toggleHabitActive(id, isActive);
 
 			if (!result.success) {
 				console.error('Failed to toggle habit:', result.message);
 				// Optionally add error handling UI here
-			} else {
-				// Update the local state to reflect the change
-				habitsWithSettings = habitsWithSettings.map((habit) => {
-					if (habit.user_habits.id === id) {
-						return {
-							...habit,
-							user_habits: {
-								...habit.user_habits,
-								active: isActive
-							}
-						};
-					}
-					return habit;
-				});
 			}
 		} catch (error) {
-			console.error('Error toggling habit:', error);
-			// Optionally add error handling UI here
+			console.error('Error in toggle handler:', error);
 		} finally {
 			isSubmitting = null;
 		}
 	}
+
+	function handleSettingsChange(updatedHabit: { habits: Habit; user_habits: UserHabit }) {
+		// Update the habit in the list
+		habitsWithSettings = habitsWithSettings.map((habit) => {
+			if (habit.habits.id === updatedHabit.habits.id) {
+				return updatedHabit;
+			}
+			return habit;
+		});
+	}
 </script>
 
 {#if editingHabit}
-	<HabitEdit {form} habit={editingHabit} onClose={() => (editingHabit = null)} />
+	<HabitSettings
+		{form}
+		habitWithSettings={editingHabit}
+		onClose={() => {
+			editingHabit = null;
+		}}
+		onSettingsChange={handleSettingsChange}
+	/>
 {:else}
 	<div class="grid gap-4">
 		{#each habitsWithSettings.filter((h) => h.habits.category === activeCategory) as habitWithSettings}
@@ -88,9 +87,9 @@
 								id={`habit-switch-${habitWithSettings.user_habits.id}`}
 								checked={habitWithSettings.user_habits.active ?? false}
 								onCheckedChange={() =>
-									toggleHabitActive(
+									handleToggleHabitActive(
 										habitWithSettings.user_habits.id,
-										!(habitWithSettings.user_habits.active ?? false)
+										!habitWithSettings.user_habits.active
 									)}
 								disabled={isSubmitting === habitWithSettings.user_habits.id}
 							/>
@@ -99,7 +98,7 @@
 							variant="ghost"
 							size="icon"
 							onclick={() => {
-								editingHabit = habitWithSettings.habits;
+								editingHabit = habitWithSettings;
 							}}
 						>
 							<Settings class="h-5 w-5" />

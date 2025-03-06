@@ -2,9 +2,8 @@ import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { userHabits } from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
-import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ params, locals, request }) => {
+export const POST = async ({ params, locals, request }) => {
 	const { id } = params;
 	const { active } = await request.json();
 

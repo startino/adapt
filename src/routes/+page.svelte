@@ -32,7 +32,7 @@
 	);
 </script>
 
-<div class="container mx-auto p-4">
+<div class="mx-auto max-w-3xl p-4">
 	<div class="mb-8 flex items-center justify-between">
 		<div class="flex items-center gap-4">
 			<Avatar.Root>
