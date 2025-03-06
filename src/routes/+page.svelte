@@ -11,15 +11,15 @@
 	import { zod } from 'sveltekit-superforms/adapters';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import HabitList from '$lib/components/habit-list/habit-list.svelte';
-	import { habitSchema, type Category } from '$lib/schemas';
-	import { categories } from '$lib/contants';
+	import { habitSchema } from '$lib/schemas';
+	import { categories, type Category } from '$lib/contants';
 
 	let { data } = $props();
 	let activeTab = $state('Habits');
-	let activeCategory: Category = $state('MOVE');
+	let activeCategory: Category = $state('move');
 	let showNewHabitDialog = $state(false);
 
-	const { form, errors, enhance, submitting } = superForm(data.form, {
+	const { form, errors, enhance, submitting } = superForm(data.habitForm, {
 		validators: zod(habitSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'success') {
@@ -157,7 +157,11 @@
 
 			<div class="mt-6">
 				<p class="mb-4 text-lg">Select your habits below, or add your own with the plus</p>
-				<HabitList habits={data.habits} {activeCategory} form={data.form} />
+				<HabitList
+					habitsWithSettings={data.habitsWithSettings}
+					{activeCategory}
+					form={data.updateHabitForm}
+				/>
 			</div>
 		</div>
 	{/if}

@@ -2,7 +2,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { habits } from '$lib/server/db/schema';
+import { habits, userHabits } from '$lib/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { habitSchema, updateHabitSchema } from '$lib/schemas';
@@ -12,17 +12,25 @@ export const load = async ({ locals }) => {
 		data: { user }
 	} = await locals.supabase.auth.getUser();
 
-	const userHabits = await db
-		.select()
-		.from(habits)
-		.where(eq(habits.owner_id, user?.id ?? ''));
+	// const userHabits = await db
+	// 	.select()
+	// 	.from(habits)
+	// 	.where(eq(habits.owner_id, user?.id ?? ''));
 
-	const form = await superValidate(zod(habitSchema));
+	const habitsWithSettings = await db
+		.select()
+		.from(userHabits)
+		.innerJoin(habits, eq(userHabits.habit_id, habits.id))
+		.where(eq(userHabits.user_id, user?.id ?? ''));
+
+	const habitForm = await superValidate(zod(habitSchema));
+	const updateHabitForm = await superValidate(zod(updateHabitSchema));
 
 	return {
-		form,
+		habitForm,
+		updateHabitForm,
 		user,
-		habits: userHabits
+		habitsWithSettings
 	};
 };
 

@@ -82,7 +82,7 @@ export const habits = pgTable('habits', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('title').notNull(),
 	description: text('description'),
-	category: text('category', { enum: categories }).notNull().default('MOVE'),
+	category: text('category', { enum: categories }).notNull().default('move'),
 	icon: text('icon').notNull().default('🏃'),
 	owner_id: uuid('owner_id').references(() => profiles.id, { onDelete: 'cascade' }),
 	created_at: timestamp('created_at', { withTimezone: true, mode: 'date' })
@@ -122,6 +122,19 @@ export const userHabits = pgTable('user_habits', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	user_id: uuid('user_id').references(() => profiles.id, { onDelete: 'cascade' }),
 	habit_id: uuid('habit_id').references(() => habits.id, { onDelete: 'cascade' }),
+	frequency_per_day: integer('frequency_per_day')
+		.notNull()
+		.default(sql`1`),
+	active: boolean('active').notNull().default(false),
+	daily_schedules: jsonb('daily_schedules')
+		.notNull()
+		.default(sql`'[]'`),
+	selected_at: timestamp('selected_at', { withTimezone: true, mode: 'date' }),
+	last_interaction_at: timestamp('last_interaction_at', { withTimezone: true, mode: 'date' }),
+	notifications_enabled: boolean('notifications_enabled').notNull().default(true),
+	notification_settings: jsonb('notification_settings')
+		.notNull()
+		.default(sql`'{"streak": true, "reminder": true, "completion": true}'`),
 	created_at: timestamp('created_at', { withTimezone: true, mode: 'date' })
 		.notNull()
 		.default(sql`now()`),

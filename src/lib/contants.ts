@@ -1,2 +1,2 @@
-export const categories = ['MOVE', 'EAT', 'SLEEP', 'MIND'] as const;
+export const categories = ['move', 'eat', 'sleep', 'mind'] as const;
 export type Category = (typeof categories)[number];

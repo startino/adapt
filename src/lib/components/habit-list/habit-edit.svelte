@@ -103,7 +103,7 @@
 						</SelectTrigger>
 						<SelectContent>
 							{#each categories as cat}
-								<SelectItem value={cat}>{cat.toLocaleUpperCase()}</SelectItem>
+								<SelectItem value={cat}>{cat}</SelectItem>
 							{/each}
 						</SelectContent>
 					</Select>
