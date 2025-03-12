@@ -15,7 +15,7 @@
 	import { categories, type Category } from '$lib/contants';
 
 	let { data } = $props();
-	let activeTab = $state('Habits');
+	let activeTab = $state<string>('habits');
 	let activeCategory: Category = $state('move');
 	let showNewHabitDialog = $state(false);
 
@@ -47,7 +47,45 @@
 		</div>
 	</div>
 
-	{#if activeTab === 'Habits'}
+	<!-- Main navigation tabs using shadcn-svelte -->
+	<div class="mb-6">
+		<div class="bg-primary w-full rounded-full p-1">
+			<div class="flex">
+				<button
+					class={`flex-1 rounded-full px-4 py-2 text-center transition-colors ${activeTab === 'goal' ? 'bg-background text-primary' : 'text-primary-foreground'}`}
+					onclick={() => (activeTab = 'goal')}
+				>
+					Goal
+				</button>
+				<button
+					class={`flex-1 rounded-full px-4 py-2 text-center transition-colors ${activeTab === 'plan' ? 'bg-background text-primary' : 'text-primary-foreground'}`}
+					onclick={() => (activeTab = 'plan')}
+				>
+					Plan
+				</button>
+				<button
+					class={`flex-1 rounded-full px-4 py-2 text-center transition-colors ${activeTab === 'habits' ? 'bg-background text-primary' : 'text-primary-foreground'}`}
+					onclick={() => (activeTab = 'habits')}
+				>
+					Habits
+				</button>
+			</div>
+		</div>
+	</div>
+
+	{#if activeTab === 'goal'}
+		<div class="mt-6">
+			<h2 class="mb-4 text-2xl font-semibold">Your Goal</h2>
+			<p class="mb-4 text-lg">Set and track your main goal here.</p>
+			<!-- Goal content will go here -->
+		</div>
+	{:else if activeTab === 'plan'}
+		<div class="mt-6">
+			<h2 class="mb-4 text-2xl font-semibold">Your Plan</h2>
+			<p class="mb-4 text-lg">Create and manage your plan here.</p>
+			<!-- Plan content will go here -->
+		</div>
+	{:else if activeTab === 'habits'}
 		<div class="mt-6">
 			<div class="flex items-center justify-between">
 				<div class="flex gap-2">
