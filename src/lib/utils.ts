@@ -80,3 +80,41 @@ export async function toggleHabitActive(
 		return { success: false, message: 'Network error' };
 	}
 }
+
+/**
+ * Type definition for a day schedule
+ */
+export type DaySchedule = {
+	day: string;
+	active: boolean;
+	schedules: {
+		event_time: string;
+		reminder_time: string | null;
+	}[];
+};
+
+/**
+ * Update a habit's schedule via API
+ * @param id The user habit ID
+ * @param schedules The new schedule data
+ * @returns A promise that resolves to the result of the API call
+ */
+export async function updateHabitSchedule(
+	id: string,
+	schedules: DaySchedule[]
+): Promise<{ success: boolean; message?: string }> {
+	try {
+		const response = await fetch(`/api/habits/${id}/schedule`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ daily_schedules: schedules })
+		});
+
+		return await response.json();
+	} catch (error) {
+		console.error('Error updating habit schedule:', error);
+		return { success: false, message: 'Network error' };
+	}
+}

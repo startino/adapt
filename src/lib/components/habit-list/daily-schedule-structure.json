@@ -1,0 +1,72 @@
+[
+	{
+		"day": "Mon",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	},
+	{
+		"day": "Tue",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	},
+	{
+		"day": "Wed",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	},
+	{
+		"day": "Thu",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	},
+	{
+		"day": "Fri",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	},
+	{
+		"day": "Sat",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	},
+	{
+		"day": "Sun",
+		"active": true,
+		"schedules": [
+			{
+				"event_time": "09:00",
+				"reminder_time": null
+			}
+		]
+	}
+]

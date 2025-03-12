@@ -19,7 +19,8 @@
 	import type { z } from 'zod';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { categories, type Category } from '$lib/contants';
-	import { toggleHabitActive } from '$lib/utils';
+	import { toggleHabitActive, updateHabitSchedule, type DaySchedule } from '$lib/utils';
+	import { HabitSchedule } from './index';
 
 	type Props = {
 		form: SuperValidated<z.infer<typeof updateHabitSchema>>;
@@ -65,6 +66,7 @@
 
 	let isActive = $state(habitWithSettings.user_habits.active ?? false);
 	let isToggling = $state(false);
+	let isUpdatingSchedule = $state(false);
 
 	$effect(() => {
 		$form = {
@@ -109,6 +111,39 @@
 			isActive = !active;
 		} finally {
 			isToggling = false;
+		}
+	}
+
+	// Handle schedule changes
+	async function handleScheduleChange(schedules: DaySchedule[]) {
+		if (!habitWithSettings.user_habits || isUpdatingSchedule) return;
+
+		isUpdatingSchedule = true;
+		try {
+			// Call the API to update the schedule
+			const result = await updateHabitSchedule(habitWithSettings.user_habits.id, schedules);
+
+			if (!result.success) {
+				console.error('Failed to update schedule:', result.message);
+			} else {
+				// Update the local state
+				const updatedHabitWithSettings = {
+					...habitWithSettings,
+					user_habits: {
+						...habitWithSettings.user_habits,
+						daily_schedules: schedules
+					}
+				};
+
+				// Notify parent component about the change using callback
+				if (onSettingsChange) {
+					onSettingsChange(updatedHabitWithSettings);
+				}
+			}
+		} catch (error) {
+			console.error('Error updating schedules:', error);
+		} finally {
+			isUpdatingSchedule = false;
 		}
 	}
 </script>
@@ -205,4 +240,12 @@
 			</div>
 		</Card.Content>
 	</Card.Root>
+
+	<!-- Add the HabitSchedule component -->
+	{#if habitWithSettings.user_habits}
+		<HabitSchedule
+			userHabit={habitWithSettings.user_habits}
+			onScheduleChange={handleScheduleChange}
+		/>
+	{/if}
 </div>
