@@ -1,17 +1,11 @@
 <script lang="ts">
-	import type { WithElementRef, WithoutChildren } from "bits-ui";
 	import type { HTMLAttributes } from "svelte/elements";
 	import { cn } from "$lib/utils.js";
 
-	let {
-		ref = $bindable(null),
-		class: className,
-		...restProps
-	}: WithoutChildren<WithElementRef<HTMLAttributes<HTMLDivElement>>> = $props();
+	type $$Props = HTMLAttributes<HTMLDivElement>;
+
+	let className: $$Props["class"] = undefined;
+	export { className as class };
 </script>
 
-<div
-	bind:this={ref}
-	class={cn("bg-muted animate-pulse rounded-md", className)}
-	{...restProps}
-></div>
+<div class={cn("bg-primary/10 animate-pulse rounded-md", className)} {...$$restProps}></div>

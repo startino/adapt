@@ -7,6 +7,21 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
+/**
+ * Format a number as currency
+ * @param value - The value to format
+ * @param currency - The currency code (default: EUR)
+ * @returns Formatted currency string
+ */
+export function formatCurrency(value: number, currency = 'EUR'): string {
+	return new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency,
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0
+	}).format(value);
+}
+
 type FlyAndScaleParams = {
 	y?: number;
 	x?: number;
@@ -54,67 +69,3 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
-
-/**
- * Toggle a habit's active status via API
- * @param id The user habit ID
- * @param isActive The new active state
- * @returns A promise that resolves to the result of the API call
- */
-export async function toggleHabitActive(
-	id: string,
-	isActive: boolean
-): Promise<{ success: boolean; message?: string }> {
-	try {
-		const response = await fetch(`/api/habits/${id}/toggle`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ active: isActive })
-		});
-
-		return await response.json();
-	} catch (error) {
-		console.error('Error toggling habit:', error);
-		return { success: false, message: 'Network error' };
-	}
-}
-
-/**
- * Type definition for a day schedule
- */
-export type DaySchedule = {
-	day: string;
-	active: boolean;
-	schedules: {
-		event_time: string;
-		reminder_time: string | null;
-	}[];
-};
-
-/**
- * Update a habit's schedule via API
- * @param id The user habit ID
- * @param schedules The new schedule data
- * @returns A promise that resolves to the result of the API call
- */
-export async function updateHabitSchedule(
-	id: string,
-	schedules: DaySchedule[]
-): Promise<{ success: boolean; message?: string }> {
-	try {
-		const response = await fetch(`/api/habits/${id}/schedule`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({ daily_schedules: schedules })
-		});
-
-		return await response.json();
-	} catch (error) {
-		console.error('Error updating habit schedule:', error);
-		return { success: false, message: 'Network error' };
-	}
-}
